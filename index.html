@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulación Monte Carlo</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 20px;
+      background-color: #54f159a1;
+    }
+    h1, h3 {
+      text-align: center;
+      color: #333;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 90%;
+    }
+    table, th, td {
+      border: 2px solid #666;
+    }
+    th, td {
+      padding: 12px;
+      text-align: center;
+      font-size: 1.2em; /* Hacer letras más legibles */
+    }
+    /* Estilo para encabezado */
+    th {
+      background-color: #5a5a5a;
+      color: white;
+      font-size: 1.4em;
+    }
+    /* Fila impar: fondo claro y texto negro */
+    tr.color-1 {
+      background-color: #9d9898;
+      color: #000;
+    }
+    /* Fila par: fondo oscuro y texto blanco */
+    tr.color-2 {
+      background-color: #333;
+      color: #fff;
+    }
+    /* Filas vacías para separación */
+    .espacio {
+      height: 20px;
+      background-color: #ffffff; /* Fondo blanco */
+    }
+    .center {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2em;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    input {
+      padding: 10px;
+      font-size: 1em;
+      width: 120px;
+      margin-left: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simulación Monte Carlo</h1>
+  <h3>Monte Carlo: Calcular aciertos dentro de un círculo</h3>
+  <div class="center">
+    <label for="aciertos">Cantidad de aciertos deseados: </label>
+    <input type="number" id="aciertos" min="1" value="10">
+    <button onclick="generarTabla()">Generar</button>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Evento</th>
+        <th>RAN1 (X)</th>
+        <th>RAN2 (Y)</th>
+        <th>D = √(X² + Y²)</th>
+        <th>D <= 1</th>
+        <th>Acierto</th>
+      </tr>
+    </thead>
+    <tbody id="tabla-resultados">
+      <!-- Los datos generados dinámicamente irán aquí -->
+    </tbody>
+  </table>
+
+  <script>
+    /**
+     * Función para redondear correctamente a tres decimales
+     * siguiendo la regla de redondeo esperada.
+     */
+    function redondearTresDecimales(numero) {
+      return Math.round(numero * 1000) / 1000;
+    }
+
+    function generarTabla() {
+      const aciertosDeseados = parseInt(document.getElementById('aciertos').value);
+      const tbody = document.getElementById('tabla-resultados');
+      tbody.innerHTML = ''; // Limpiar la tabla
+      let aciertos = 0; // Contador de aciertos
+      let evento = 0; // Contador de eventos
+      let colorIndex = 1; // Alternar entre color-1 y color-2
+
+      while (aciertos < aciertosDeseados) {
+        const x = Math.random(); // Generar RAN1 (X)
+        const y = Math.random(); // Generar RAN2 (Y)
+        const d = Math.sqrt(x ** 2 + y ** 2); // Calcular D
+        const esAcierto = d <= 1; // Verificar si es acierto (D <= 1)
+
+        // Solo incrementar aciertos si es "SI"
+        if (esAcierto) {
+          aciertos++;
+        }
+
+        // Aplicar redondeo a 3 decimales
+        const xRounded = redondearTresDecimales(x);
+        const yRounded = redondearTresDecimales(y);
+        const dRounded = redondearTresDecimales(d);
+
+        // Crear fila de datos
+        const fila = document.createElement('tr');
+        fila.classList.add(`color-${colorIndex}`); // Asignar clase alternada
+        fila.innerHTML = `
+          <td>${++evento}</td>
+          <td>${xRounded.toFixed(3)}</td>
+          <td>${yRounded.toFixed(3)}</td>
+          <td>${dRounded.toFixed(3)}</td>
+          <td>${esAcierto ? 'SI' : 'NO'}</td>
+          <td>${aciertos}</td>
+        `;
+        tbody.appendChild(fila);
+
+        // Alternar entre color-1 y color-2
+        colorIndex = colorIndex === 1 ? 2 : 1;
+
+        // Agregar dos filas vacías después de cada fila de datos
+        for (let i = 0; i < 2; i++) {
+          const filaEspacio = document.createElement('tr');
+          filaEspacio.classList.add('espacio');
+          filaEspacio.innerHTML = `<td colspan="6"></td>`;
+          tbody.appendChild(filaEspacio);
+        }
+      }
+    }
+  </script>
+</body>
+</html>
